@@ -1,23 +1,18 @@
 {
-  "name": "project3",
+  "name": "stickdrift",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "start": "node server/server.js",
-    "start:dev": "concurrently \"cd server && npm run watch\" \"wait-on tcp:3001 && cd client && npm run dev\"",
-    "server": "cd server && npm start",
-    "server:dev": "cd server && npm run dev",
-    "install": "cd server && npm i && cd ../client && npm i",
-    "client:build": "cd client && npm run build",
-    "client:dev": "cd client && npm run dev",
-    "seed": "cd server && npm run build && npm run seed",
-    "build": "concurrently \"cd server && npm run build\" \"cd client && npm run build\"",
-    "render-build": "npm install && npm run build"
+    "install": "npm install --prefix server && npm install --prefix client",
+    "client:dev": "npm run dev --prefix client",
+    "server:dev": "npm run dev --prefix server",
+    "dev": "concurrently \"npm run server:dev\" \"wait-on tcp:4000 && npm run client:dev\"",
+    "client:build": "npm run build --prefix client",
+    "server:build": "npm run build --prefix server",
+    "build": "concurrently \"npm run server:build\" \"npm run client:build\"",
+    "start": "node server/dist/index.js",
+    "seed": "npm run seed --prefix server"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "concurrently": "^8.2.2",
     "wait-on": "^7.2.0"
