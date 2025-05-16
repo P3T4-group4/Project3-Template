@@ -1,39 +1,53 @@
+// server/src/utils/auth.ts
 import jwt from 'jsonwebtoken';
-import { GraphQLError } from 'graphql';
+import { Request } from 'express';
+import { AuthenticationError } from '@apollo/server';
 import dotenv from 'dotenv';
 dotenv.config();
 
-export const authenticateToken = ({ req }: any) => {
-  let token = req.body.token || req.query.token || req.headers.authorization;
+const SECRET_KEY = process.env.JWT_SECRET_KEY ?? '';
+const EXPIRATION = '2h';
 
-  if (req.headers.authorization) {
-    token = token.split(' ').pop().trim();
-  }
+// Shape of what we embed in the JWT
+export interface Payload {
+  _id: string;
+  name: string;
+  email: string;
+}
+
+// Shape of what we return into Apollo’s context
+export interface AuthContext {
+  user?: Payload;
+}
+
+/**
+ * Sign a JWT for a given profile payload.
+ */
+export function signToken(payload: Payload): string {
+  return jwt.sign({ data: payload }, SECRET_KEY, {
+    expiresIn: EXPIRATION,
+  });
+}
+
+/**
+ * Extracts and verifies a JWT from the Authorization header.
+ * Returns `{ user }` if valid, otherwise throws AuthenticationError.
+ */
+export function authenticateToken(req: Request): AuthContext {
+  const authHeader = req.headers.authorization ?? '';
+  // Expect “Bearer ‹token›”
+  const token = authHeader.startsWith('Bearer ')
+    ? authHeader.slice(7).trim()
+    : authHeader.trim();
 
   if (!token) {
-    return req;
+    throw new AuthenticationError('No token provided, authorization denied');
   }
 
   try {
-    const { data }: any = jwt.verify(token, process.env.JWT_SECRET_KEY || '', { maxAge: '2hr' });
-    req.user = data;
-  } catch (err) {
-    console.log('Invalid token');
+    const { data } = jwt.verify(token, SECRET_KEY) as any;
+    return { user: data as Payload };
+  } catch {
+    throw new AuthenticationError('Invalid or expired token');
   }
-
-  return req;
-};
-
-export const signToken = (username: string, email: string, _id: unknown) => {
-  const payload = { username, email, _id };
-  const secretKey: any = process.env.JWT_SECRET_KEY;
-
-  return jwt.sign({ data: payload }, secretKey, { expiresIn: '2h' });
-};
-
-export class AuthenticationError extends GraphQLError {
-  constructor(message: string) {
-    super(message, undefined, undefined, undefined, ['UNAUTHENTICATED']);
-    Object.defineProperty(this, 'name', { value: 'AuthenticationError' });
-  }
-};
+}
