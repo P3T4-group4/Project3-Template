@@ -1,45 +1,61 @@
-import express from 'express';
+// server/src/server.ts
+import express, { Request, Response } from 'express';
 import path from 'node:path';
-import type { Request, Response } from 'express';
-import db from './config/connection.js'
-import { ApolloServer } from '@apollo/server';// Note: Import from @apollo/server-express
+import cors from 'cors';
+import bodyParser from 'body-parser';
+import dotenv from 'dotenv';
+import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
+
+import db from './config/connection.js';
 import { typeDefs, resolvers } from './schemas/index.js';
 import { authenticateToken } from './utils/auth.js';
 
-const server = new ApolloServer({
-  typeDefs,
-  resolvers
-});
+dotenv.config();
 
-const startApolloServer = async () => {
-  await server.start();
+async function startApolloServer() {
+  // 1. Connect to MongoDB
   await db();
+  console.log('✅ Database connected');
 
-  const PORT = process.env.PORT || 3001;
+  // 2. Start ApolloServer
+  const server = new ApolloServer({ typeDefs, resolvers });
+  await server.start();
+
+  // 3. Create Express app
   const app = express();
+  const PORT = parseInt(process.env.PORT || '3001', 10);
 
-  app.use(express.urlencoded({ extended: false }));
-  app.use(express.json());
+  // 4. Mount /graphql with CORS & body parsing
+  app.use(
+    '/graphql',
+    cors<cors.CorsRequest>(),
+    bodyParser.json(),
+    expressMiddleware(server, {
+      context: async ({ req }: { req: Request }) => {
+        // authenticateToken should read the token from headers
+        const user = await authenticateToken(req);
+        return { user };
+      },
+    })
+  );
 
-  app.use('/graphql', expressMiddleware(server as any,
-    {
-      context: authenticateToken as any
-    }
-  ));
-
+  // 5. Serve React build in production
   if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '../client/dist')));
-
+    const clientBuildPath = path.join(__dirname, '../client/dist');
+    app.use(express.static(clientBuildPath));
     app.get('*', (_req: Request, res: Response) => {
-      res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+      res.sendFile(path.join(clientBuildPath, 'index.html'));
     });
   }
 
+  // 6. Start HTTP server
   app.listen(PORT, () => {
-    console.log(`API server running on port ${PORT}!`);
-    console.log(`Use GraphQL at http://localhost:${PORT}/graphql`);
+    console.log(`🚀 Server listening at http://localhost:${PORT}/graphql`);
   });
-};
+}
 
-startApolloServer();
+startApolloServer().catch((err) => {
+  console.error('Failed to start server:', err);
+  process.exit(1);
+});
