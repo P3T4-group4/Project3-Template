@@ -1,5 +1,5 @@
 import { Navigate, useParams } from 'react-router-dom';
-import { useMutation, useQuery } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client';
 import { Link } from 'react-router-dom';
 import { QUERY_SINGLE_PROFILE, QUERY_ME } from '../utils/queries';
 import { FOLLOW_PROFILE, UNFOLLOW_PROFILE } from '../utils/mutations';

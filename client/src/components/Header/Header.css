@@ -59,6 +59,7 @@
     text-transform: uppercase;
     background: linear-gradient(to right, #00f7ff 50%, #ff00c8 50%);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
     text-shadow: 0 0 6px #00f7ff88, 0 0 12px #ff00c888;
@@ -74,6 +75,7 @@
     width: 100%;
     background: linear-gradient(to right, #00f7ff 50%, #ff00c8 50%);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
     opacity: 0.7;

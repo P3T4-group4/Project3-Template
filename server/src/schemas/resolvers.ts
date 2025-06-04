@@ -1,156 +1,130 @@
-import { Profile } from '../models/index.js';
-import { signToken, AuthenticationError } from '../utils/auth.js';
-
-interface Profile {
-  _id: string;
-  name: string;
-  email: string;
-  password: string;
-  followers: string[];
-  following: string[];
-}
-
-interface FollowResponse {
-  success: boolean;
-  message: string;
-  profile: Profile | null;
-}
-
-interface UnfollowResponse {
-  success: boolean;
-  message: string;
-  profile: Profile | null;
-}
-
-interface ProfileArgs {
-  profileId: string;
-}
-
-interface AddProfileArgs {
-  input:{
-    name: string;
-    email: string;
-    password: string;
-  }
-}
+// server/src/schemas/resolvers.ts
+import { AuthenticationError } from 'apollo-server-express';
+import bcrypt from 'bcrypt';
+import { Profile } from '../models/Profile';
+import { signToken } from '../utils/auth';
 
 interface Context {
-  user?: Profile;
+  user: {
+    _id: string;
+    name: string;
+    email: string;
+  } | null;
 }
 
-const resolvers = {
+export const resolvers = {
   Query: {
-    profiles: async (): Promise<Profile[]> => {
-      return await Profile.find();
+    // Get all profiles
+    profiles: async () => {
+      return await Profile.find().populate('followers').populate('following');
     },
-    profile: async (_parent: any, _args: ProfileArgs, _context: Context): Promise<Profile | null> => {
-      const { profileId } = _args;
-      return await Profile.findOne({ _id: profileId }).populate('followers', '_id name').populate('following', '_id name');
+
+    // Get a single profile by ID
+    profile: async (_parent: any, { profileId }: { profileId: string }) => {
+      return await Profile.findById(profileId).populate('followers').populate('following');
     },
-    me: async (_parent: any, _args: any, context: Context): Promise<Profile | null> => {
-      if (context.user) {
-        return await Profile.findById( context.user._id ).populate('followers', '_id name').populate('following', '_id name');
+
+    // Get the current logged-in user
+    me: async (_parent: any, _args: any, context: Context) => {
+      if (!context.user) {
+        throw new AuthenticationError('Not logged in');
       }
-      throw new AuthenticationError('You need to be logged in!');
+      return await Profile.findById(context.user._id).populate('followers').populate('following');
     },
-   searchProfile: async (_parent: any, { name }: { name: string }) => {
-      const profiles = await Profile.find({ name: new RegExp(name, 'i') }).select('_id name');
-      return profiles.map(profile => ({ _id: profile._id.toString(), name: profile.name }));  
+
+    // Search by name or email
+    searchProfile: async (_parent: any, { searchTerm }: { searchTerm: string }) => {
+      const regex = new RegExp(searchTerm, 'i');
+      return await Profile.find({
+        $or: [{ name: regex }, { email: regex }],
+      }).limit(10);
     },
   },
+
   Mutation: {
-    addProfile: async (_parent: any, { input }: AddProfileArgs): Promise<{ token: string; profile: Profile }> => {
-      const profile = await Profile.create({ ...input });
-      const token = signToken(profile.name, profile.email, profile._id);
-      return { token, profile };
+    // Signup: create a new profile, return Auth payload
+    addProfile: async (
+      _parent: any,
+      { name, email, password }: { name: string; email: string; password: string }
+    ) => {
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+      const newProfile = await Profile.create({
+        name,
+        email,
+        password: hashedPassword,
+      });
+
+      // Convert ObjectId to string for JWT
+      const token = signToken(newProfile.name, newProfile.email, newProfile._id.toString());
+      return { token, profile: newProfile };
     },
-    login: async (_parent: any, { email, password }: { email: string; password: string }): Promise<{ token: string; profile: Profile }> => {
+
+    // Login: validate credentials, return Auth payload
+    login: async (_parent: any, { email, password }: { email: string; password: string }) => {
       const profile = await Profile.findOne({ email });
       if (!profile) {
-        throw AuthenticationError;
+        throw new AuthenticationError('Incorrect credentials');
       }
-      const correctPw = await profile.isCorrectPassword(password);
-      if (!correctPw) {
-        throw AuthenticationError;
+      const validPw = await bcrypt.compare(password, profile.password);
+      if (!validPw) {
+        throw new AuthenticationError('Incorrect credentials');
       }
-      const token = signToken(profile.name, profile.email, profile._id);
+
+      const token = signToken(profile.name, profile.email, profile._id.toString());
       return { token, profile };
     },
-    removeProfile: async (_parent: any, _args: any, context: Context): Promise<Profile | null> => {
-      if (context.user) {
-        return await Profile.findOneAndDelete({ _id: context.user._id });
-      }
-      throw AuthenticationError;
-    },
-    followProfile: async (_parent: any, { profileId }: ProfileArgs, context: Context): Promise<FollowResponse | null> => {
-      try {
-        if (context.user) {
-          await Profile.findOneAndUpdate(
-            { _id: context.user._id },
-            { $addToSet: { following: profileId } },
-          );
-          const profile = await Profile.findOneAndUpdate(
-            { _id: profileId },
-            { $addToSet: { followers: context.user._id } },
-            { new: true }
-          ).select('_id name');
-          return {
-            success: true,
-            message: 'Successfully followed the profile.',
-            profile: profile,
-          };
-        } else {
-          return {
-            success: false,
-            message: 'Could not follow the profile.',
-            profile: null,
-          }
-        }
-      } catch (error) {
-        console.error('Error following profile:', error);
-          return {
-            success: false,
-            message: 'Could not follow the profile.',
-            profile: null,
-          };
-          
-        }
-      },
-    unfollowProfile: async (_parent: any, { profileId }: ProfileArgs, context: Context): Promise<UnfollowResponse | null> => {
-      try {
-        if (context.user) {
-          await Profile.findOneAndUpdate(
-            { _id: context.user._id },
-            { $pull: { following: profileId } },
-          );
-          const profile = await Profile.findOneAndUpdate(
-            { _id: profileId },
-            { $pull: { followers: context.user._id } },
-            { new: true }
-          );
-          return {
-            success: true,
-            message: 'Successfully unfollowed the profile.',
-            profile: profile,
-          };
-        } else {
-          return {
-            success: false,
-            message: 'Could not unfollow the profile.',
-            profile: null,
-          }
-        }
-      }
-      catch (error) {
-        console.error('Error unfollowing profile:', error);
-        return {
-            success: false,
-            message: 'Could not unfollow the profile.',
-            profile: null,
-          };
-      }
-        },
-  },
- };
 
-export default resolvers;
+    // Delete the current logged-in user
+    removeProfile: async (_parent: any, _args: any, context: Context) => {
+      if (!context.user) {
+        throw new AuthenticationError('Not logged in');
+      }
+      return await Profile.findByIdAndDelete(context.user._id);
+    },
+
+    // Follow another profile
+    followProfile: async (_parent: any, { profileId }: { profileId: string }, context: Context) => {
+      if (!context.user) {
+        throw new AuthenticationError('You must be logged in to follow');
+      }
+      const userId = context.user._id;
+      if (userId === profileId) {
+        throw new Error("You can't follow yourself");
+      }
+      // Add to “following” array of current user
+      await Profile.findByIdAndUpdate(userId, {
+        $addToSet: { following: profileId },
+      });
+      // Add to “followers” array of the target profile
+      const updatedTarget = await Profile.findByIdAndUpdate(
+        profileId,
+        { $addToSet: { followers: userId } },
+        { new: true }
+      )
+        .populate('followers')
+        .populate('following');
+      return updatedTarget;
+    },
+
+    // Unfollow another profile
+    unfollowProfile: async (_parent: any, { profileId }: { profileId: string }, context: Context) => {
+      if (!context.user) {
+        throw new AuthenticationError('You must be logged in to unfollow');
+      }
+      const userId = context.user._id;
+      // Pull from “following” array of current user
+      await Profile.findByIdAndUpdate(userId, { $pull: { following: profileId } });
+      // Pull from “followers” array of the target profile
+      const updatedTarget = await Profile.findByIdAndUpdate(
+        profileId,
+        { $pull: { followers: userId } },
+        { new: true }
+      )
+        .populate('followers')
+        .populate('following');
+      return updatedTarget;
+    },
+  },
+};

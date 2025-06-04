@@ -1,0 +1,53 @@
+# .github/workflows/build-and-test.yml
+
+name: CI ‒ Build & Test
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main, dev ]
+
+jobs:
+  build-server:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install server dependencies
+        working-directory: ./server
+        run: npm install
+
+      - name: Build server (TypeScript → dist)
+        working-directory: ./server
+        run: npm run build
+
+  build-client:
+    runs-on: ubuntu-latest
+    needs: build-server
+    strategy:
+      matrix:
+        node-version: [18.x]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install client dependencies
+        working-directory: ./client
+        run: npm install
+
+      - name: Build client (vite build)
+        working-directory: ./client
+        run: npm run build

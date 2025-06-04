@@ -1,65 +1,74 @@
-import express from 'express';
+// server/src/server.ts
+import express, { Application, Request } from 'express';
 import cors from 'cors';
-import path from 'node:path';
-import type { Request, Response } from 'express';
-import db from './config/connection.js'
-import { ApolloServer } from '@apollo/server';// Note: Import from @apollo/server-express
-import { expressMiddleware } from '@apollo/server/express4';
-import { typeDefs, resolvers } from './schemas/index.js';
-import { authenticateToken } from './utils/auth.js';
+import bodyParser from 'body-parser';
+import dotenv from 'dotenv';
+import path from 'path';
+import { ApolloServer } from 'apollo-server-express';
+import db from './config/connection';
+import { typeDefs, resolvers } from './schemas';
+import { authenticateToken } from './utils/auth';
 
-interface Context {
-  user: any | null;
- } // Adjust the type as needed
+dotenv.config();
 
-const server = new ApolloServer<Context>({
-  typeDefs,
-  resolvers
-});
+const PORT: number = process.env.PORT ? parseInt(process.env.PORT) : 3001;
 
-const startApolloServer = async () => {
-  await server.start();
+// “Application” must come from the same express that apollo-server-express uses under the hood.
+const app: Application = express();
+
+async function startApolloServer() {
+  // 1. Connect to MongoDB
   await db();
+  console.log('✅ Database connected');
 
-  const PORT = process.env.PORT || 3001;
-  const app = express();
+  // 2. Create ApolloServer and pass context via authenticateToken
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    context: ({ req }: { req: Request }) => {
+      // Extract and verify JWT from “Authorization” header (if present)
+      const user = authenticateToken(req);
+      return { user };
+    },
+  });
+  await server.start();
 
-  app.use(express.urlencoded({ extended: false }));
-  app.use(express.json());
-
-  // app.use('/graphql', expressMiddleware(server as any,
-  //   {
-  //     context: authenticateToken as any
-  //   }
-  // ));
-
-  app.use(cors());
-  app.use(express.json());
-
+  // 3. CORS must be registered BEFORE applyMiddleware
   app.use(
-  '/graphql',
-  expressMiddleware<Context>(server, {
-    context: async ({ req }) => {
-      const token = req.headers.authorization?.split(' ')[1];;
-      const user = token ? authenticateToken(token) : null;
-      console.log('Context user:', user); // Log the user for debugging
-      return { user }; // This is now passed to all resolvers
-    }
-  })
-);
+    cors({
+      origin: 'http://localhost:5173',  // <– exactly your Vite front‐end origin
+      credentials: true,
+      methods: ['POST', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+    })
+  );
 
+  app.use(bodyParser.json());
+
+  // 4. If in production, serve the React build output
   if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.join(__dirname, '../client/dist')));
+  }
 
-    app.get('*', (_req: Request, res: Response) => {
-      res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+  // 5. Attach Apollo middleware onto Express
+  server.applyMiddleware({
+    app: app as any,      // “as any” to avoid Express “Application” mismatch
+    path: '/graphql',
+  });
+
+  // 6. In production, let React Router handle front‐end routes
+  if (process.env.NODE_ENV === 'production') {
+    app.get('*', (_req, res) => {
+      res.sendFile(path.resolve(__dirname, '../client/dist/index.html'));
     });
   }
 
+  // 7. Finally, listen
   app.listen(PORT, () => {
-    console.log(`API server running on port ${PORT}!`);
-    console.log(`Use GraphQL at http://localhost:${PORT}/graphql`);
+    console.log(`🚀 Server running at http://localhost:${PORT}${server.graphqlPath}`);
   });
-};
+}
 
-startApolloServer();
+startApolloServer().catch((err) => {
+  console.error('Error starting server:', err);
+});

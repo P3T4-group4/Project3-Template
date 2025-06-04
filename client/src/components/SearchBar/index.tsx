@@ -1,65 +1,66 @@
-import React, { useState } from 'react';
-import { useLazyQuery } from '@apollo/client';
-import { SEARCH_PROFILE } from '../../utils/queries';
-import { useNavigate } from 'react-router-dom';
-import './SearchBar.css'; 
-// import { Link } from 'react-router-dom';
-// import { Outlet } from 'react-router-dom';
+import React, { useState, ChangeEvent, FormEvent } from 'react';
+import '../../components/SearchBar/SearchBar.css';
+interface SearchBarProps {
+  onSearch: (term: string) => void;
+  loading?: boolean;
+  results?: Array<{ id: string; name: string }>;
+  onSelect?: (id: string) => void;
+}
 
-const SearchBar: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchProfile, { loading, data, error }] = useLazyQuery(SEARCH_PROFILE);
-  const [dropDown, setDropDown] = useState(false);
-  const navigate = useNavigate();
+const SearchBar: React.FC<SearchBarProps> = ({
+  onSearch,
+  loading = false,
+  results = [],
+  onSelect,
+}) => {
+  const [term, setTerm] = useState('');
 
-  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (searchQuery.trim() !== '') {
-      searchProfile({ variables: { name: searchQuery } });
-      setDropDown(true);
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setTerm(value);
+
+    if (value.length >= 2) {
+      onSearch(value);
     }
   };
 
-  const handleProfileClick = (profileId: string) => {
-    navigate(`/profiles/${profileId}`);
-    setSearchQuery('');
-    setDropDown(false);
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (term.length >= 2) {
+      onSearch(term);
+    }
   };
 
   return (
-    <div className='searchbar-container'>
-      <form onSubmit={handleSearch} autoComplete="off" className="search-form">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search profiles..."
-          onFocus={() => data && setDropDown(true)}
-          className="search-input"
-        />
-        <button type="submit" className="search-button">Search</button>
-      </form>
+    <form className="searchbar-container" onSubmit={handleSubmit}>
+      <input
+        type="text"
+        placeholder="Search profiles..."
+        value={term}
+        onChange={handleChange}
+        className="search-input"
+      />
+      {loading && <div className="search-loading">Searching…</div>}
 
-      {dropDown && data?.searchProfile?.length > 0 && (
-        <ul className="search-dropdown">
-          {data.searchProfile.map((profile: { _id: string; name: string }) => (
-            <li
-              key={profile._id}
-              className="search-result"
-              onClick={() => handleProfileClick(profile._id)}
-            >
-              {profile.name}
+      {results.length > 0 && (
+        <ul className="search-results">
+          {results.map((item) => (
+            <li key={item.id} className="search-result-item">
+              <span>{item.name}</span>
+              {onSelect && (
+                <button
+                  type="button"
+                  className="search-result-btn"
+                  onClick={() => onSelect(item.id)}
+                >
+                  View
+                </button>
+              )}
             </li>
           ))}
         </ul>
       )}
-
-      {loading && <p className="search-message">Loading...</p>}
-      {error && <p className="search-message">Error: {error.message}</p>}
-      {dropDown && data?.searchProfile?.length === 0 && (
-        <p className="search-message">No profiles found.</p>
-      )}
-    </div>
+    </form>
   );
 };
 

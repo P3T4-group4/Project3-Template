@@ -1,16 +1,17 @@
+// client/vite.config.ts
 import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
-// https://vitejs.dev/config/
 export default defineConfig({
+  plugins: [
+    react(), // ← This tells Vite how to transform .tsx/.jsx
+  ],
   server: {
-    port: 3000,
-    open: true,
-    proxy: {
-    '/graphql': {
-        target: 'http://localhost:3001',
-        changeOrigin: true,
-        secure: false,
-      },
-    },
+    port: 5173,
   },
+  resolve: {
+    alias: [
+      { find: '@', replacement: '/src' } // optional, only if you want "@/" imports
+    ]
+  }
 });

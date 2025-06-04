@@ -1,33 +1,41 @@
-import { Link } from 'react-router-dom';
-import { type MouseEvent } from 'react';
-import Auth from '../../utils/auth';
-import "./Header.css";
-// import 'animate.css';
-import logo from '../../assets/stickdrift-logo.png';
-const Header = () => {
-  const logout = (event: MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    Auth.logout();
+// client/src/components/Header.tsx
+
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import AuthService from '../../utils/auth';
+import '../../styles//Header.css';
+
+const Header: React.FC = () => {
+  const navigate = useNavigate();
+  const loggedIn = AuthService.loggedIn();
+
+  const handleLogout = () => {
+    AuthService.logout();
+    navigate('/login');
   };
 
   return (
     <header className="header">
       <div className="header-content">
+        {/* Logo and App Name */}
         <Link to="/" className="logo">
-        <img src={logo} alt="Stickdrift Logo" className="logo-image animate__animated animate__fadeInDown" />
-
-        <h1 className="glitch-text" data-text="Stickdrift">
-  Stickdrift
-</h1>
-
+          {/* Replace "/logo.png" with the path to your actual logo file */}
+          <img src="/logo.png" alt="StickDrift Logo" className="logo-image" />
+          <h1 className="glitch-text" data-text="StickDrift">
+            StickDrift
+          </h1>
         </Link>
+
+        {/* Navigation Links */}
         <nav className="nav-links">
-          {Auth.loggedIn() ? (
+          {loggedIn ? (
             <>
-              <Link to="/me">View My Profile</Link>
-              <button onClick={logout} aria-label="Logout">
-                Logout
-              </button>
+              <Link to="/">Home</Link>
+              <Link to="/search">Search</Link>
+              <Link to={`/profile/${AuthService.getProfile().data._id}`}>
+                My Profile
+              </Link>
+              <button onClick={handleLogout}>Logout</button>
             </>
           ) : (
             <>

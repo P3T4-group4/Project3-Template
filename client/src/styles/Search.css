@@ -1,0 +1,44 @@
+/* client/src/pages/Search.css */
+.search-page-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+.search-page-input {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.search-page-result {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.search-page-btn {
+  background-color: #282c34;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.search-page-btn:hover {
+  background-color: #3b3f47;
+}
+
+@media (max-width: 600px) {
+  .search-page-result {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .search-page-btn {
+    margin-top: 0.5rem;
+  }
+}

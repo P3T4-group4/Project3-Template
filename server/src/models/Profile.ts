@@ -1,36 +1,37 @@
-import { Schema, model, Document } from 'mongoose';
-import bcrypt from 'bcrypt';
+// server/src/models/Profile.ts
 
-// Define an interface for the Profile document
-interface IProfile extends Document {
-  _id: string;
+import { Schema, model, Types } from 'mongoose';
+
+export interface IProfile {
+  _id: Types.ObjectId;
   name: string;
   email: string;
-  password:string;
-  followers: string[];
-  following: string[];
-  isCorrectPassword(password: string): Promise<boolean>;
+  password: string;
+  createdAt: Date;
+  followers: Types.ObjectId[];
+  following: Types.ObjectId[];
 }
 
-// Define the schema for the Profile document
 const profileSchema = new Schema<IProfile>(
   {
     name: {
       type: String,
       required: true,
-      unique: true,
       trim: true,
     },
     email: {
       type: String,
       required: true,
       unique: true,
-      match: [/.+@.+\..+/, 'Must match an email address!'],
+      trim: true,
     },
     password: {
       type: String,
       required: true,
-      minlength: 5,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
     },
     followers: [
       {
@@ -46,27 +47,11 @@ const profileSchema = new Schema<IProfile>(
     ],
   },
   {
-    timestamps: true,
-    toJSON: { getters: true },
-    toObject: { getters: true },
+    toJSON: {
+      virtuals: true,
+    },
+    id: false,
   }
 );
 
-// set up pre-save middleware to create password
-profileSchema.pre<IProfile>('save', async function (next) {
-  if (this.isNew || this.isModified('password')) {
-    const saltRounds = 10;
-    this.password = await bcrypt.hash(this.password, saltRounds);
-  }
-
-  next();
-});
-
-// compare the incoming password assert the hashed password
-profileSchema.methods.isCorrectPassword = async function (password: string): Promise<boolean> {
-  return bcrypt.compare(password, this.password);
-};
-
-const Profile = model<IProfile>('Profile', profileSchema);
-
-export default Profile;
+export const Profile = model<IProfile>('Profile', profileSchema);

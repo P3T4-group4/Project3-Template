@@ -1,21 +1,17 @@
-import { useRouteError } from 'react-router-dom';
+// client/src/pages/Error.tsx
+import React from 'react';
+import { Link } from 'react-router-dom';
+import '../styles/Error.css';
 
-interface RouteError {
-  statusText?: string;
-  message?: string;
-}
-
-export default function ErrorPage() {
-  const error = useRouteError() as RouteError;
-  console.error(error);
-
+const ErrorPage: React.FC = () => {
   return (
-    <div id="error-page">
-      <h1>Oops!</h1>
-      <p>Sorry, an unexpected error has occurred.</p>
-      <p>
-        <i>{error.statusText || error.message}</i>
-      </p>
-    </div>
+    <main className="page-wrapper">
+      <div className="error-container">
+        <h2>Oops! Page Not Found (404)</h2>
+        <Link to="/" className="link-button">Go back to Home</Link>
+      </div>
+    </main>
   );
-}
+};
+
+export default ErrorPage;

@@ -1,3 +1,18 @@
+/* client/src/pages/Calendar.css */
+
+/* Keyframes for the glowing border */
+@keyframes glowPulsePinkBlue {
+  0% {
+    box-shadow: 0 0 10px #00f7ff33, 0 0 20px #ff00c833;
+  }
+  50% {
+    box-shadow: 0 0 25px #ff00c8aa, 0 0 35px #00f7ffaa;
+  }
+  100% {
+    box-shadow: 0 0 10px #00f7ff33, 0 0 20px #ff00c833;
+  }
+}
+
 /* === CONTENEDOR PRINCIPAL === */
 .calendar-container {
   background-color: #111122;
@@ -96,21 +111,45 @@
 }
 
 .cell:hover {
-  transform: scale(1.05);/* === DESCRIPCIÓN DEL CALENDARIO === */
+  transform: scale(1.05);
+  box-shadow: 0 0 8px #00f7ffaa, 0 0 16px #ff00c877;
+}
+
+/* === CELDAS VACÍAS === */
+.empty {
+  background-color: transparent;
+  border: none;
+}
+
+/* === DESCRIPCIÓN DEL CALENDARIO === */
 .calendar-description {
   font-size: 1rem;
   margin-top: 2rem;
   background: linear-gradient(to right, #00f7ff, #ff00c8);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  color: transparent;
   text-shadow: 0 0 4px #00f7ff88, 0 0 6px #ff00c877;
   font-family: 'Orbitron', sans-serif;
   animation: glowPulsePinkBlue 2.5s ease-in-out infinite;
 }
 
-  box-shadow: 0 0 8px #00f7ffaa, 0 0 16px #ff00c877;
-}
+/* === RESPONSIVE ADJUSTMENTS === */
+@media (max-width: 600px) {
+  .calendar-container {
+    padding: 1.5rem;
+  }
 
-/* === CELDAS VACÍAS === */
-.empty
+  .cell {
+    min-height: 60px;
+    padding: 0.5rem 0.25rem;
+    font-size: 0.9rem;
+  }
+
+  .calendar-title {
+    font-size: 2rem;
+  }
+
+  .calendar-subtitle {
+    font-size: 1rem;
+  }
+}

@@ -1,0 +1,72 @@
+/* client/src/pages/Error.css */
+
+/* Full‐screen wrapper matching neon theme */
+.error-container {
+  min-height: 100vh;
+  background-color: #0a0a1e;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  font-family: 'Orbitron', sans-serif;
+  color: #00f7ff;
+}
+
+/* Neon gradient heading */
+.error-container h2 {
+  font-size: 3rem;
+  background: linear-gradient(to right, #00f7ff, #ff00c8);
+  -webkit-background-clip: text;
+  background-clip: text; /* standard property for compatibility */
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 10px #00f7ff88, 0 0 20px #ff00c833;
+  margin-bottom: 2rem;
+  animation: glowPulsePinkBlue 2.5s ease-in-out infinite;
+}
+
+/* Link styled as a neon button */
+.error-container a {
+  font-size: 1.2rem;
+  background: transparent;
+  border: 2px solid #00f7ff;
+  color: #00f7ff;
+  padding: 0.8rem 1.5rem;
+  border-radius: 6px;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px #00f7ff22;
+}
+
+/* Hover effect on the link */
+.error-container a:hover {
+  background-color: #00f7ff22;
+  color: white;
+  box-shadow: 0 0 12px #00f7ffaa, 0 0 24px #ff00c877;
+  text-decoration: none;
+}
+
+/* Keyframes for the glowing effect (reused from other CSS) */
+@keyframes glowPulsePinkBlue {
+  0% {
+    text-shadow: 0 0 10px #00f7ff33, 0 0 20px #ff00c833;
+  }
+  50% {
+    text-shadow: 0 0 25px #ff00c8aa, 0 0 35px #00f7ffaa;
+  }
+  100% {
+    text-shadow: 0 0 10px #00f7ff33, 0 0 20px #ff00c833;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .error-container h2 {
+    font-size: 2.5rem;
+  }
+  .error-container a {
+    font-size: 1rem;
+    padding: 0.6rem 1.2rem;
+  }
+}

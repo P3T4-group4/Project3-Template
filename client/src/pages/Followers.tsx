@@ -5,7 +5,7 @@ import { useQuery } from '@apollo/client';
 import { Link, useParams } from 'react-router-dom';
 import Auth from '../utils/auth';
 import { useEffect } from 'react';
-import './Followers.css';
+import '../styles/Followers.css';
 
 interface Profile {
   _id: string;

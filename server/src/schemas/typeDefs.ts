@@ -1,55 +1,37 @@
-const typeDefs = `
+// server/src/schemas/typeDefs.ts
+import { gql } from 'apollo-server-express';
+
+export const typeDefs = gql`
+  # ------------- TYPES -------------
   type Profile {
-    _id: ID
-    name: String
-    email: String
-    password: String
+    _id: ID!
+    name: String!
+    email: String!
+    password: String!
+    createdAt: String
     followers: [Profile]
     following: [Profile]
   }
 
   type Auth {
-    token: ID!
-    profile: Profile
-  }
-  
-  input ProfileInput {
-    name: String!
-    email: String!
-    password: String!
+    token: String!
+    profile: Profile!
   }
 
+  # ---------------- QUERIES ----------------
   type Query {
     profiles: [Profile]!
     profile(profileId: ID!): Profile
     me: Profile
-    searchProfile(name: String!): [Profile!]!
+    searchProfile(searchTerm: String!): [Profile]
   }
 
-  type FollowResponse {
-    success: Boolean!
-    message: String!
-    profile: Profile
-  }
-  
-  type UnfollowResponse {
-    success: Boolean!
-    message: String!
-    profile: Profile
-  }
-  
-  type searchProfile {
-    _id: ID!
-    name: String!
-  }
-
+  # ---------------- MUTATIONS ----------------
   type Mutation {
-    addProfile(input: ProfileInput!): Auth
+    addProfile(name: String!, email: String!, password: String!): Auth
     login(email: String!, password: String!): Auth
     removeProfile: Profile
-    followProfile(profileId: ID!): FollowResponse!
-    unfollowProfile(profileId: ID!): UnfollowResponse!
+    followProfile(profileId: ID!): Profile
+    unfollowProfile(profileId: ID!): Profile
   }
 `;
-
-export default typeDefs;

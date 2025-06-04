@@ -1,26 +1,55 @@
 {
   "compilerOptions": {
     /* Language and Environment */
-    "target": "ES2020" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
-    /* Modules */
-    "module": "ESNext" /* Specify what module code is generated. */,
-    "moduleResolution": "Bundler" /* Specify how TypeScript looks up a file from a given module specifier. */,
-    "skipLibCheck": true,
+    "target": "ES2020",                          /* Modern JS output */
+    "module": "ESNext",                          /* Keep ES modules for bundlers */
+    "moduleResolution": "node",                  /* Standard Node module lookup */
+    "jsx": "react-jsx",                          /* Enable the new JSX transform (no need to import React) */
+    "skipLibCheck": true,                        /* Speed up by skipping declaration checks */
+
     /* JavaScript Support */
-    "allowJs": true /* Allow JavaScript files to be a part of your program. Use the 'checkJS' option to get errors from these files. */,
-    "checkJs": true /* Enable error reporting in type-checked JavaScript files. */,
+    "allowJs": true,                             /* Allow importing .js files */
+    "checkJs": true,                             /* Type-check in JS files if present */
+
     /* Interop Constraints */
-    "esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */,
-    "allowSyntheticDefaultImports": true /* Allow default imports from modules assert no default export. This does not affect code emit, just typechecking. */,
-    "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
-    /* Type Checking */
+    "esModuleInterop": true,                     /* Support `import x from 'commonjs-module'` */
+    "allowSyntheticDefaultImports": true,        /* Allow default imports from modules with no default export */
+    "forceConsistentCasingInFileNames": true,    /* Prevent casing mismatches in imports */
+
+    /* Strictness / Type Checking */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "exactOptionalPropertyTypes": true /* Interpret optional property types as written, rather than adding 'undefined'. */,
-    "noImplicitReturns": true /* Enable error reporting for codepaths that do not explicitly return in a function. */,
-    "noImplicitOverride": true /* Ensure overriding members in derived classes are marked assert an override modifier. */,
-    "useUnknownInCatchVariables": true /* Ensure 'unknown' is used for catch clause variables. */
-  }
+    "exactOptionalPropertyTypes": true,
+    "noImplicitReturns": true,
+    "noImplicitOverride": true,
+    "useUnknownInCatchVariables": true,
+
+    /* Output (for server) */
+    "outDir": "./server/dist",                   /* Emit server .ts → .js here */
+
+    /* Source maps (optional if you want debugging) */
+    "sourceMap": true,
+
+    /* Helps path aliases (if you add any later) */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["*"]
+    }
+  },
+
+  /* Make sure TypeScript looks at both client and server code */
+  "include": [
+    "server/src/**/*.ts",
+    "client/src/**/*.ts",
+    "client/src/**/*.tsx"
+  ],
+
+  /* Exclude build artifacts and node_modules */
+  "exclude": [
+    "node_modules",
+    "server/dist",
+    "client/dist"
+  ]
 }

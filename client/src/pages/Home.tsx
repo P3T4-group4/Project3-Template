@@ -1,26 +1,34 @@
-import { useQuery } from '@apollo/client';
+// client/src/pages/Home.tsx
+import { useLazyQuery } from '@apollo/client';
+import SearchBar from '../components/SearchBar';
+import { QUERY_SEARCH_PROFILE } from '../utils/queries'; 
+// ─── Changed: imported QUERY_SEARCH_PROFILE (singular)
 
-import { QUERY_PROFILES } from '../utils/queries';
+function Home() {
+  // Run the searchProfile query on demand:
+  const [searchProfiles] = useLazyQuery(QUERY_SEARCH_PROFILE);
 
- import'./Home.css';
-//  import 'animate.css'
-const Home = () => {
-  const { loading, data } = useQuery(QUERY_PROFILES);
-  const profiles = data?.profiles || [];
+  // This callback gets passed down to <SearchBar />:
+  const handleSearch = (searchTerm: string) => {
+    searchProfiles({
+      variables: { searchTerm },
+    })
+      .then(({ data }) => {
+        console.log('Search results:', data.searchProfile);
+        // You could store data.searchProfile in state here if you want to display results
+      })
+      .catch((err) => console.error(err));
+  };
 
   return (
     <main>
       <div>
-        <div>
-          {loading ? (
-            <div>Loading...</div>
-          ) : (
-            <h3>There are {profiles.length} users.</h3>
-          )}
-        </div>
+        {/* Pass handleSearch into the SearchBar so onSearch is satisfied */}
+        <SearchBar onSearch={handleSearch} />
+        {/* …the rest of your Home page markup… */}
       </div>
     </main>
   );
-};
+}
 
 export default Home;

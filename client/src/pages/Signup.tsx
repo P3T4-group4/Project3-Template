@@ -1,98 +1,71 @@
-import { useState, type FormEvent, type ChangeEvent } from 'react';
-import { Link } from 'react-router-dom';
-
+// client/src/pages/Signup.tsx
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@apollo/client';
 import { ADD_PROFILE } from '../utils/mutations';
+import AuthService from '../utils/auth';
+import '../styles/Signup.css';
 
-import Auth from '../utils/auth';
+const Signup: React.FC = () => {
+  const navigate = useNavigate();
+  const [formState, setFormState] = useState({ name: '', email: '', password: '' });
+  const [addProfile, { error }] = useMutation(ADD_PROFILE);
 
-const Signup = () => {
-  const [formState, setFormState] = useState({
-    name: '',
-    email: '',
-    password: '',
-  });
-  const [addProfile, { error, data }] = useMutation(ADD_PROFILE);
-
-  // update state based on form input changes
-  const handleChange = (event: ChangeEvent) => {
-    const { name, value } = event.target as HTMLInputElement;
-
-    setFormState({
-      ...formState,
-      [name]: value,
-    });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormState({ ...formState, [name]: value });
   };
 
-  // submit form
-  const handleFormSubmit = async (event: FormEvent) => {
-    event.preventDefault();
-    console.log(formState);
-
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     try {
-      const { data } = await addProfile({
-        variables: { input: { ...formState } },
-      });
-
-      Auth.login(data.addProfile.token);
-    } catch (e) {
-      console.error(e);
+      const { data } = await addProfile({ variables: { ...formState } });
+      AuthService.login(data.addProfile.token);
+      navigate('/');
+    } catch (err) {
+      console.error(err);
     }
   };
 
   return (
-    <main>
-      <div>
-        <div>
-          <h4>Sign Up</h4>
-          <div>
-            {data ? (
-              <p>
-                Success! You may now head{' '}
-                <Link to="/">back to the homepage.</Link>
-              </p>
-            ) : (
-              <form onSubmit={handleFormSubmit}>
-                <input
-                  placeholder="Your name"
-                  name="name"
-                  type="text"
-                  value={formState.name}
-                  onChange={handleChange}
-                />
-                <input
-                  placeholder="Your email"
-                  name="email"
-                  type="email"
-                  value={formState.email}
-                  onChange={handleChange}
-                />
-                <input
-                  placeholder="******"
-                  name="password"
-                  type="password"
-                  value={formState.password}
-                  onChange={handleChange}
-                />
-                <button
-                  style={{ cursor: 'pointer' }}
-                  type="submit"
-                >
-                  Submit
-                </button>
-              </form>
-            )}
+    <div className="form-container">
+      <h2>Sign Up</h2>
+      <form onSubmit={handleFormSubmit}>
+        <label htmlFor="name">Name:</label>
+        <input
+          type="text"
+          name="name"
+          id="name"
+          value={formState.name}
+          onChange={handleChange}
+          required
+        />
 
-            {error && (
-              <div>
-                {error.message}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </main>
+        <label htmlFor="email">Email:</label>
+        <input
+          type="email"
+          name="email"
+          id="email"
+          value={formState.email}
+          onChange={handleChange}
+          required
+        />
+
+        <label htmlFor="password">Password:</label>
+        <input
+          type="password"
+          name="password"
+          id="password"
+          value={formState.password}
+          onChange={handleChange}
+          required
+          minLength={6}
+        />
+
+        <button type="submit">Sign Up</button>
+      </form>
+      {error && <p className="error-text">Signup failed: {error.message}</p>}
+    </div>
   );
 };
-
 export default Signup;
