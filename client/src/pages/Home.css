@@ -88,3 +88,10 @@ main > div {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+img {
+  max-width: 30px;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 0 10px #00f7ff33;
+}

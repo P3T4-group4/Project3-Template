@@ -7,6 +7,7 @@ import'./Home.css';
 import Auth from '../utils/auth';
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
+import button from '../assets/menu-button.jpg';
 
 interface Profile {
   _id: string;
@@ -27,7 +28,7 @@ const Profile = () => {
 
   const [isMutating, setIsMutating] = useState(false);
   const [justFollowed, setjustFollowed] = useState<boolean | null>(null);
-  const [isOpen, setIsOpen] = useState(false);
+  // const [isOpen, setIsOpen] = useState(false);
 
   const profile = data?.me || data?.profile || {};
   
@@ -97,7 +98,7 @@ const Profile = () => {
   return (
     <div className="profile-container">
       {/* <h2 className="neon-heading">{profile?.name}</h2> */}
-      {currentProfileId && profile._id !== currentProfileId && (
+      {/* {currentProfileId && profile._id !== currentProfileId && (
         isFollowing ? (
           <button className="neon-button" onClick={handleUnfollow} disabled={isMutating}>
           {isMutating ? "Processing..." : "Unfollow"}</button>
@@ -107,21 +108,32 @@ const Profile = () => {
           </button>
           )
         )
-    }
+    } */}
       <div className="menu-button relative inline-block text-left mt-4">
         <button
           className="neon-button"
         >
-          Menu ▾
+          <img src={button} alt="Menu" className="w-8 h-8" />
         </button>
           <div className="menu-items absolute mt-2 left-0 rounded-md shadow-lg bg-black border border-pink-500 z-50 px-2 py-2">
             <div className="flex flex-row gap-2">
-              <Link to="wishlist" onClick={() => setIsOpen(false)} className="neon-button">Wishlist</Link>
-              <Link to="calendar" onClick={() => setIsOpen(false)} className="neon-button">Calendar</Link>
-              <Link to="library" onClick={() => setIsOpen(false)} className="neon-button">Library</Link>
-              <Link to="followers" onClick={() => setIsOpen(false)} className="neon-button">Followers</Link>
-              <Link to="gamecollection" onClick={() => setIsOpen(false)} className="neon-button">Collection</Link>
-              <Link to="playlist" onClick={() => setIsOpen(false)} className="neon-button">Playlist</Link>
+              {currentProfileId && profile._id !== currentProfileId && (
+                isFollowing ? (
+                  <button className="neon-button" onClick={handleUnfollow} disabled={isMutating}>
+                  {isMutating ? "Processing..." : "Unfollow"}</button>
+                  ) : (
+                  <button className="neon-button" onClick={handleFollow} disabled={isMutating}>
+                  {isMutating ? "Processing..." : "Follow"}
+                  </button>
+                  )
+                )
+              }
+              <Link to="wishlist" className="neon-button">Wishlist</Link>
+              <Link to="calendar" className="neon-button">Calendar</Link>
+              <Link to="library" className="neon-button">Library</Link>
+              <Link to="followers" className="neon-button">Followers</Link>
+              <Link to="gamecollection" className="neon-button">Collection</Link>
+              <Link to="playlist" className="neon-button">Playlist</Link>
             </div>
           </div>
       </div>
