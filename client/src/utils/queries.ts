@@ -1,48 +1,53 @@
-// client/src/utils/queries.ts
 import { gql } from '@apollo/client';
 
 export const QUERY_PROFILES = gql`
-  query GetProfiles {
+  query allProfiles {
     profiles {
       _id
       name
-      email
-      followers { _id name }
-      following { _id name }
     }
   }
 `;
 
 export const QUERY_SINGLE_PROFILE = gql`
-  query GetProfile($profileId: ID!) {
+  query singleProfile($profileId: ID!) {
     profile(profileId: $profileId) {
       _id
       name
-      email
-      followers { _id name }
-      following { _id name }
+      followers {
+        _id
+        name
+      }
+      following {
+        _id
+        name
+      }
     }
   }
 `;
 
 export const QUERY_ME = gql`
-  query Me {
+  query me {
     me {
       _id
       name
-      email
-      followers { _id name }
-      following { _id name }
+      followers {
+        _id
+        name
+      }
+      following {
+        _id
+        name
+      }
     }
   }
 `;
 
-export const QUERY_SEARCH_PROFILE = gql`
-  query SearchProfile($searchTerm: String!) {
-    searchProfile(searchTerm: $searchTerm) {
+export const SEARCH_PROFILE = gql`
+  query searchProfile($name: String!) {
+    searchProfile(name: $name) {
       _id
       name
-      email
     }
   }
 `;

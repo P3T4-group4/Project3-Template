@@ -29,3 +29,49 @@
 .profile-container ul li {
   margin-bottom: 0.5rem;
 }
+
+.profile-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.profile {
+  display: flex;
+  justify-content: center;
+}
+
+.menu-button {
+  padding: 0.5rem 1rem;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  background-color: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  justify-content: center;
+}
+
+.menu-items {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.menu-button .menu-items {
+  display: none;
+}
+
+.menu-button:hover .menu-items,
+.menu-button:focus-within .menu-items {
+  display: inline-flex;
+}
+
+.menu-items .neon-button {
+  min-width: 120px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

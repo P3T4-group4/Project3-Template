@@ -51,70 +51,68 @@
     transition: transform 0.3s ease;
     text-decoration: none;
   }
-  .glitch-text {
+  .glitch-horizontal {
     position: relative;
-    font-family: 'Orbitron', sans-serif;
     font-size: 2.5rem;
-    font-weight: bold;
+    font-family: 'Orbitron', sans-serif;
     text-transform: uppercase;
-    background: linear-gradient(to right, #00f7ff 50%, #ff00c8 50%);
+    background: linear-gradient(90deg, #00f7ff 0%, #00f7ff 40%, #ff00c8 60%, #ff00c8 100%);
     -webkit-background-clip: text;
-    background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
-    text-shadow: 0 0 6px #00f7ff88, 0 0 12px #ff00c888;
-    animation: glitchSkew 1s infinite alternate;
+    text-shadow: 0 0 4px #00f7ff;
+    animation: scanline-flicker 3s infinite ease-in-out;
   }
   
-  .glitch-text::before,
-  .glitch-text::after {
+  /* Glitch slice layers */
+  .glitch-horizontal::before,
+  .glitch-horizontal::after {
     content: attr(data-text);
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    background: linear-gradient(to right, #00f7ff 50%, #ff00c8 50%);
+    background: linear-gradient(90deg, #00f7ff 0%, #00f7ff 40%, #ff00c8 60%, #ff00c8 100%);
     -webkit-background-clip: text;
-    background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
-    opacity: 0.7;
+    opacity: 0.8;
     pointer-events: none;
-    z-index: -1;
   }
   
-  .glitch-text::before {
-    clip-path: inset(0 0 45% 0);
-    animation: glitchBefore 0.9s infinite linear alternate-reverse;
+  .glitch-horizontal::before {
+    clip-path: polygon(0 20%, 100% 20%, 100% 25%, 0 25%);
+    animation: glitch-slice-1 2s infinite linear alternate-reverse;
   }
   
-  .glitch-text::after {
-    clip-path: inset(55% 0 0 0);
-    animation: glitchAfter 1.2s infinite linear alternate-reverse;
+  .glitch-horizontal::after {
+    clip-path: polygon(0 65%, 100% 65%, 100% 70%, 0 70%);
+    animation: glitch-slice-2 1.8s infinite linear alternate-reverse;
   }
   
-  /* Subtle skew/flicker */
-  @keyframes glitchSkew {
-    0%   { transform: skew(0deg); }
-    100% { transform: skew(1deg); }
+  @keyframes glitch-slice-1 {
+    0% { transform: translateX(-2px); }
+    50% { transform: translateX(2px); }
+    100% { transform: translateX(-1px); }
   }
   
-  /* Top half flicker */
-  @keyframes glitchBefore {
-    0%   { transform: translate(0, 0); }
-    25%  { transform: translate(-2px, -1px); }
-    50%  { transform: translate(2px, -2px); }
-    75%  { transform: translate(-1px, 1px); }
-    100% { transform: translate(0, 0); }
+  @keyframes glitch-slice-2 {
+    0% { transform: translateX(2px); }
+    50% { transform: translateX(-3px); }
+    100% { transform: translateX(1px); }
   }
   
-  /* Bottom half flicker */
-  @keyframes glitchAfter {
-    0%   { transform: translate(0, 0); }
-    25%  { transform: translate(2px, 2px); }
-    50%  { transform: translate(-2px, 1px); }
-    75%  { transform: translate(1px, -1px); }
-    100% { transform: translate(0, 0); }
+  @keyframes scanline-flicker {
+    0%, 100% { opacity: 1; }
+    10% { opacity: 0.85; }
+    20% { opacity: 0.7; }
+    30% { opacity: 0.9; }
+    40% { opacity: 0.6; }
+    50% { opacity: 1; }
+    60% { opacity: 0.75; }
+    70% { opacity: 0.95; }
+    80% { opacity: 0.65; }
+    90% { opacity: 0.9; }
   }
   
   

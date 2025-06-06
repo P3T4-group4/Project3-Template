@@ -2,7 +2,6 @@ import { useState, type FormEvent, type ChangeEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation } from '@apollo/client';
 import { LOGIN_USER } from '../utils/mutations';
-import '../styles/Login.css';
 
 
 import Auth from '../utils/auth';
@@ -63,7 +62,7 @@ const Login = () => {
                   onChange={handleChange}
                 />
                 <input
-                  placeholder="******"
+                  placeholder="Passward"
                   name="password"
                   type="password"
                   value={formState.password}
@@ -79,9 +78,11 @@ const Login = () => {
             )}
 
             {error && (
-              <div>
-                {error.message}
-              </div>
+              <div style={{ color: 'red', marginTop: '8px' }}>
+    {error.message.includes('Incorrect credentials')
+      ? 'Incorrect email or password.'
+      : 'Login failed. Please try again.'}
+  </div>
             )}
           </div>
         </div>

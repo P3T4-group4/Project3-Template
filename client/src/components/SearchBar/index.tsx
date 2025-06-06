@@ -1,67 +1,74 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react';
-import '../../components/SearchBar/SearchBar.css';
-interface SearchBarProps {
-  onSearch: (term: string) => void;
-  loading?: boolean;
-  results?: Array<{ id: string; name: string }>;
-  onSelect?: (id: string) => void;
+import React, { useState } from 'react';
+import { useLazyQuery } from '@apollo/client';
+import { SEARCH_PROFILE } from '../../utils/queries';
+import { useNavigate } from 'react-router-dom';
+
+const SearchBar: React.FC = () => {
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchProfile, { loading, data, error }] = useLazyQuery(SEARCH_PROFILE);
+    const [dropDown, setDropDown] = useState(false);
+    const navigate = useNavigate();
+
+    const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        // Implement search functionality here
+        if (searchQuery.trim() !== '') {
+            searchProfile({
+                variables: { name: searchQuery }
+            })
+            setDropDown(true);
+        }
+    };
+
+    const handleProfileClick = (profileId: string) => {
+        navigate(`/profiles/${profileId}`);
+        setSearchQuery('');
+        setDropDown(false);
+    };
+
+    return (
+        <div style={{ position: 'relative', width: '100%' }}>
+            <form onSubmit={handleSearch} autoComplete='off'>
+                <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Searching profiles..."
+                    onFocus={() => data && setDropDown(true)}
+                />
+                <button type="submit">Search</button>
+            </form>
+
+            {dropDown && data && Array.isArray(data.searchProfile) && data?.searchProfile.length > 0 && (
+                <ul style={{ position: 'absolute',
+                    top: '100%',
+                    left: 0,
+                    right: 0,
+                    backgroundColor: 'white',
+                    border: '1px solid #ccc',
+                    zIndex: 1000,
+                    listStyle: 'none',
+                    padding: '0',
+                    margin: '0',
+                    width: '169px',
+                }}>
+                    {data.searchProfile.map((profile: { _id: string; name: string }) => (
+                        <li
+                            key={profile._id}
+                            onClick={() => handleProfileClick(profile._id)}
+                            style={{ padding: '10px', cursor: 'pointer', borderBottom: '1px solid #ccc' }}
+                        >
+                            {profile.name}
+                        </li>
+                    ))}
+                </ul>
+            )}
+
+                {loading && <p>Loading...</p>}
+                {error && <p>Error: {error.message}</p>}
+                {dropDown && data && Array.isArray(data.SearchProfile) && data?.searchProfile.length === 0 && <p>No profiles found.</p>}
+        </div>
+    )
 }
-
-const SearchBar: React.FC<SearchBarProps> = ({
-  onSearch,
-  loading = false,
-  results = [],
-  onSelect,
-}) => {
-  const [term, setTerm] = useState('');
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setTerm(value);
-
-    if (value.length >= 2) {
-      onSearch(value);
-    }
-  };
-
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (term.length >= 2) {
-      onSearch(term);
-    }
-  };
-
-  return (
-    <form className="searchbar-container" onSubmit={handleSubmit}>
-      <input
-        type="text"
-        placeholder="Search profiles..."
-        value={term}
-        onChange={handleChange}
-        className="search-input"
-      />
-      {loading && <div className="search-loading">Searching…</div>}
-
-      {results.length > 0 && (
-        <ul className="search-results">
-          {results.map((item) => (
-            <li key={item.id} className="search-result-item">
-              <span>{item.name}</span>
-              {onSelect && (
-                <button
-                  type="button"
-                  className="search-result-btn"
-                  onClick={() => onSelect(item.id)}
-                >
-                  View
-                </button>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-    </form>
-  );
-};
 
 export default SearchBar;

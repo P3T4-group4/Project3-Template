@@ -36,12 +36,13 @@ async function startApolloServer() {
   // 3. CORS must be registered BEFORE applyMiddleware
   app.use(
     cors({
-      origin: 'http://localhost:5173',  // <– exactly your Vite front‐end origin
+      origin: ['http://localhost:5173', 'http://localhost:5174'],
       credentials: true,
       methods: ['POST', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization'],
     })
   );
+  
 
   app.use(bodyParser.json());
 

@@ -1,72 +1,116 @@
-/* client/src/pages/Error.css */
-
-/* Full‐screen wrapper matching neon theme */
-.error-container {
-  min-height: 100vh;
-  background-color: #0a0a1e;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 2rem;
-  font-family: 'Orbitron', sans-serif;
+/* === CONTENEDOR PRINCIPAL === */
+.calendar-container {
+  background-color: #111122;
   color: #00f7ff;
-}
-
-/* Neon gradient heading */
-.error-container h2 {
-  font-size: 3rem;
-  background: linear-gradient(to right, #00f7ff, #ff00c8);
-  -webkit-background-clip: text;
-  background-clip: text; /* standard property for compatibility */
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 10px #00f7ff88, 0 0 20px #ff00c833;
-  margin-bottom: 2rem;
+  font-family: 'Orbitron', sans-serif;
+  padding: 2.5rem 3rem;
+  border: 2px solid #00f7ff88;
+  border-radius: 16px;
+  box-shadow: 0 0 20px #00f7ff33;
+  max-width: 700px;
+  width: 100%;
+  text-align: center;
   animation: glowPulsePinkBlue 2.5s ease-in-out infinite;
 }
 
-/* Link styled as a neon button */
-.error-container a {
+/* === TÍTULO PRINCIPAL === */
+.calendar-title {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(to right, #00f7ff, #ff00c8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 10px #00f7ff88;
+}
+
+/* === SUBTÍTULO (Mes y Año) === */
+.calendar-subtitle {
   font-size: 1.2rem;
+  margin: 0;
+  color: #00f7ff;
+  text-shadow: 0 0 6px #00f7ff99;
+}
+
+/* === NAVEGACIÓN === */
+.navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+/* === BOTONES DE NAVEGACIÓN === */
+.nav-button {
   background: transparent;
   border: 2px solid #00f7ff;
   color: #00f7ff;
-  padding: 0.8rem 1.5rem;
+  font-family: 'Orbitron', sans-serif;
+  padding: 0.4rem 1rem;
   border-radius: 6px;
   text-transform: uppercase;
-  text-decoration: none;
+  cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 0 10px #00f7ff22;
 }
 
-/* Hover effect on the link */
-.error-container a:hover {
+.nav-button:hover {
   background-color: #00f7ff22;
   color: white;
-  box-shadow: 0 0 12px #00f7ffaa, 0 0 24px #ff00c877;
-  text-decoration: none;
+  box-shadow: 0 0 12px #00f7ffaa;
 }
 
-/* Keyframes for the glowing effect (reused from other CSS) */
-@keyframes glowPulsePinkBlue {
-  0% {
-    text-shadow: 0 0 10px #00f7ff33, 0 0 20px #ff00c833;
-  }
-  50% {
-    text-shadow: 0 0 25px #ff00c8aa, 0 0 35px #00f7ffaa;
-  }
-  100% {
-    text-shadow: 0 0 10px #00f7ff33, 0 0 20px #ff00c833;
-  }
+/* === CABECERAS DE DÍAS DE LA SEMANA === */
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 0.5rem;
 }
 
-/* Responsive adjustments */
-@media (max-width: 600px) {
-  .error-container h2 {
-    font-size: 2.5rem;
-  }
-  .error-container a {
-    font-size: 1rem;
-    padding: 0.6rem 1.2rem;
-  }
+.header.weekday {
+  font-family: 'Orbitron', sans-serif;
+  color: #00f7ff;
+  text-shadow: 0 0 6px #00f7ff55;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #00f7ff33;
+  text-align: center;
 }
+
+/* === GRID PRINCIPAL === */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+/* === CELDAS DE DÍAS === */
+.cell {
+  min-height: 80px;
+  background-color: #101225;
+  border: 1px solid #00f7ff33;
+  border-radius: 6px;
+  text-align: center;
+  color: #00f7ff;
+  padding: 1rem 0.5rem;
+  font-family: 'Orbitron', sans-serif;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cell:hover {
+  transform: scale(1.05);/* === DESCRIPCIÓN DEL CALENDARIO === */
+.calendar-description {
+  font-size: 1rem;
+  margin-top: 2rem;
+  background: linear-gradient(to right, #00f7ff, #ff00c8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  text-shadow: 0 0 4px #00f7ff88, 0 0 6px #ff00c877;
+  font-family: 'Orbitron', sans-serif;
+  animation: glowPulsePinkBlue 2.5s ease-in-out infinite;
+}
+
+  box-shadow: 0 0 8px #00f7ffaa, 0 0 16px #ff00c877;
+}
+
+/* === CELDAS VACÍAS === */
+.empty

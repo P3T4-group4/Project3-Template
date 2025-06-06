@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLazyQuery, useQuery, useMutation } from '@apollo/client';
-import { QUERY_SEARCH_PROFILE, QUERY_ME } from '../utils/queries';
+import { SEARCH_PROFILE, QUERY_ME } from '../utils/queries';
 import { FOLLOW_PROFILE, UNFOLLOW_PROFILE } from '../utils/mutations';
 import '../styles/Search.css';
 
@@ -26,7 +26,7 @@ const SearchPage: React.FC = () => {
 
   // 2) Lazy query to search other profiles
   const [searchProfiles, { data: searchData, loading: searchLoading }] =
-    useLazyQuery<QuerySearchProfileResult>(QUERY_SEARCH_PROFILE);
+    useLazyQuery<QuerySearchProfileResult>(SEARCH_PROFILE);
 
   // 3) Mutations to follow / unfollow (refetch QUERY_ME to update “following”)
   const [followProfile] = useMutation(FOLLOW_PROFILE, {

@@ -1,41 +1,30 @@
-// client/src/components/Header.tsx
-
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import AuthService from '../../utils/auth';
-import '../../styles//Header.css';
-
-const Header: React.FC = () => {
-  const navigate = useNavigate();
-  const loggedIn = AuthService.loggedIn();
-
-  const handleLogout = () => {
-    AuthService.logout();
-    navigate('/login');
+import { Link } from 'react-router-dom';
+import { type MouseEvent } from 'react';
+import Auth from '../../utils/auth';
+import "./Header.css";
+// import 'animate.css';
+import logo from '../../assets/stickdrift-logo.png';
+const Header = () => {
+  const logout = (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    Auth.logout();
   };
 
   return (
     <header className="header">
       <div className="header-content">
-        {/* Logo and App Name */}
         <Link to="/" className="logo">
-          {/* Replace "/logo.png" with the path to your actual logo file */}
-          <img src="/logo.png" alt="StickDrift Logo" className="logo-image" />
-          <h1 className="glitch-text" data-text="StickDrift">
-            StickDrift
-          </h1>
-        </Link>
 
-        {/* Navigation Links */}
+        <h1 className="logo-title glitch-horizontal" data-text="STICKDRIFT">STICKDRIFT</h1>
+
+        </Link>
         <nav className="nav-links">
-          {loggedIn ? (
+          {Auth.loggedIn() ? (
             <>
-              <Link to="/">Home</Link>
-              <Link to="/search">Search</Link>
-              <Link to={`/profile/${AuthService.getProfile().data._id}`}>
-                My Profile
-              </Link>
-              <button onClick={handleLogout}>Logout</button>
+              <Link to="/me">View My Profile</Link>
+              <button onClick={logout} aria-label="Logout">
+                Logout
+              </button>
             </>
           ) : (
             <>

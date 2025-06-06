@@ -1,11 +1,14 @@
-// client/src/pages/Calendar.tsx
-
 import React, { useState } from 'react';
-import '../styles/Calendar.css';
+import '../styles/Calendar.css'; // Adjust the path as necessary
+
+interface Props {
+  month: number; // 1-12
+  year: number;
+}
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-const Calendar: React.FC = () => {
+const Calendar: React.FC<Props> = () => {
   const today = new Date();
   const [month, setMonth] = useState(today.getMonth());
   const [year, setYear] = useState(today.getFullYear());
@@ -39,11 +42,7 @@ const Calendar: React.FC = () => {
   }
 
   for (let day = 1; day <= daysInMonth; day++) {
-    cells.push(
-      <div key={day} className={`cell${day === today.getDate() && month === today.getMonth() && year === today.getFullYear() ? ' today' : ''}`}>
-        {day}
-      </div>
-    );
+    cells.push(<div key={day} className="cell">{day}</div>);
   }
 
   return (
@@ -52,26 +51,24 @@ const Calendar: React.FC = () => {
         <h1 className="calendar-title">Release Calendar</h1>
 
         <div className="navigation">
-          <button className="nav-button" onClick={handlePrevMonth}>
-            ← Previous
-          </button>
+          <button className="nav-button" onClick={handlePrevMonth}>← Previous</button>
           <h2 className="calendar-subtitle">
             {firstDay.toLocaleString('default', { month: 'long' })} {year}
           </h2>
-          <button className="nav-button" onClick={handleNextMonth}>
-            Next →
-          </button>
+          <button className="nav-button" onClick={handleNextMonth}>Next →</button>
         </div>
 
         <div className="weekdays">
           {weekdays.map(day => (
-            <div key={day} className="header weekday">
-              {day}
-            </div>
+            <div key={day} className="header weekday">{day}</div>
           ))}
         </div>
 
-        <div className="grid">{cells}</div>
+        <div className="grid">
+          {cells}
+        </div>
+
+       
       </div>
     </main>
   );

@@ -1,32 +1,28 @@
-// client/src/components/Footer.tsx
-
-import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import '../../styles/Footer.css';
 
 const Footer: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
   const handleGoBack = () => {
-    if (window.history.length > 1) {
+    if(window.history.length > 1) { //Check if there is a previous page in the history stack
       navigate(-1);
     } else {
       navigate('/');
     }
-  };
-
+  }
+  
   return (
-    <footer className="footer-container">
-      <div className="footer-content">
+    <footer>
+      <div>
         {location.pathname !== '/' && (
-          <button className="footer-link" onClick={handleGoBack}>
+          <button
+            onClick={handleGoBack}
+          >
             &larr; Go Back
           </button>
         )}
-        <div className="footer-text">
-          &copy; {new Date().getFullYear()} — Project Three Team
-        </div>
+        <h4>&copy; {new Date().getFullYear()} - Project Three Team</h4>
       </div>
     </footer>
   );

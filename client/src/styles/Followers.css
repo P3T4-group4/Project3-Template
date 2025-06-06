@@ -10,6 +10,7 @@
     font-size: 2rem;
     background: linear-gradient(to right, #00f7ff, #ff00c8);
     -webkit-background-clip: text;
+    background-clip: text; /* standard property for compatibility */
     -webkit-text-fill-color: transparent;
     text-shadow: 0 0 10px #00f7ff88;
     margin-bottom: 1rem;
@@ -64,6 +65,7 @@
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 0 6px #00f7ff33;
+    white-space: nowrap;
   }
   
   .neon-button:hover {
